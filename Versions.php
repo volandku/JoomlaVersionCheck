@@ -2,8 +2,7 @@
 
 
 namespace Volandku\Versions;
-
-
+use Exception;
 
 class Versions
 {
@@ -17,8 +16,17 @@ class Versions
     public static function checkJoomla($rawurl)
     {
         $urlxml=self::correctUrl($rawurl).'administrator/manifests/files/joomla.xml';
-        $filexml=new \SimpleXMLElement(file_get_contents($urlxml));
-        $v=(string)$filexml->version[0];
+        try {
+            $filexml=new \SimpleXMLElement(file_get_contents($urlxml));
+            $v=(string)$filexml->version[0];
+        } catch (Exception $e)
+        {
+            $urlxml=self::correctUrl($rawurl).'/language/en-GB/en-GB.xml';
+            $filexml=new \SimpleXMLElement(file_get_contents($urlxml));
+            $v=(string)$filexml->version[0];
+        }
+
+
         if (!empty($v)) return $v; else return false;
     }
 }
